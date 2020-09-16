@@ -47,4 +47,21 @@ export class Programa extends Contract {
 
         await ctx.stub.putState(id, Buffer.from(JSON.stringify(atividade)));
     }
+
+    public async alterarStatusAtividade(ctx: Context, id: string, status: string) {
+        let atividade = JSON.parse(await this.consultarAtividade(ctx, id));
+        atividade.status = status;
+
+        await ctx.stub.putState(id, Buffer.from(JSON.stringify(atividade)));
+    }
+
+    public async consultarAtividadePessoa(ctx: Context, id_pessoa: string){}
+
+    public async consultarAtividadeDataExecucao(ctx: Context, data: string){}
+    
+    public async consultarBeneficioAtividade(ctx: Context, id_atividade: string){}
+    
+    public async consultarBeneficioDataExecucao(ctx: Context, data: string){}
+
+    public async consultarAtividadeUsuario(ctx: Context, usuario: string){}
 }
