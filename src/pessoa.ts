@@ -12,7 +12,7 @@ export class Pessoa extends Contract {
     }
 
     public async consultarPessoa(ctx: Context, id: string): Promise<string> {
-        const pessoa = await ctx.stub.getState(id); // get the id from chaincode state
+        const pessoa = await ctx.stub.getState(id); 
         if (!pessoa || pessoa.length === 0) {
             throw new Error(`${id} does not exist`);
         }

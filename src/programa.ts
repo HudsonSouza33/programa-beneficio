@@ -12,7 +12,7 @@ export class Programa extends Contract {
     }
 
     public async consultarBeneficio(ctx: Context, id: string): Promise<string>{
-        const beneficio = await ctx.stub.getState(id); // get the id from chaincode state
+        const beneficio = await ctx.stub.getState(id); 
         if (!beneficio || beneficio.length === 0) {
             throw new Error(`${id} does not exist`);
         }
@@ -33,7 +33,7 @@ export class Programa extends Contract {
     }
 
     public async consultarAtividade(ctx: Context, id: string): Promise<string>{
-        const atividade = await ctx.stub.getState(id); // get the id from chaincode state
+        const atividade = await ctx.stub.getState(id); 
         if (!atividade || atividade.length === 0) {
             throw new Error(`${id} does not exist`);
         }
@@ -55,13 +55,57 @@ export class Programa extends Contract {
         await ctx.stub.putState(id, Buffer.from(JSON.stringify(atividade)));
     }
 
-    public async consultarAtividadePessoa(ctx: Context, id_pessoa: string){}
-
-    public async consultarAtividadeDataExecucao(ctx: Context, data: string){}
     
-    public async consultarBeneficioAtividade(ctx: Context, id_atividade: string){}
-    
-    public async consultarBeneficioDataExecucao(ctx: Context, data: string){}
+    public async consultarLedger(ctx: any, key: any) {
 
-    public async consultarAtividadeUsuario(ctx: Context, usuario: string){}
+        let resultsIterator = await ctx.stub.getQueryResult(key);
+        let results = await this.GetAllResults(resultsIterator, true);
+        console.log('RESULTS consultarLedger ');
+
+        return JSON.stringify(results);
+
+    }
+
+    async GetAllResults(iterator: any, isHistory: any) {
+        let allResults = [];
+        let res = await iterator.next();
+        while (!res.done) {
+            if (res.value && res.value.value.toString()) {
+                let jsonRes: any = {};
+                console.log(res.value.value.toString('utf8'));
+                if (isHistory && isHistory === true) {
+                    jsonRes.TxId = res.value.tx_id;
+                    jsonRes.Timestamp = res.value.timestamp;
+                    try {
+                        jsonRes.Value = JSON.parse(res.value.value.toString('utf8'));
+                        console.log('jsonRes.Value ', jsonRes.Value);
+
+                    } catch (err) {
+                        console.log(err);
+                        jsonRes.Value = res.value.value.toString('utf8');
+                    }
+                } else {
+                    jsonRes.Key = res.value.key;
+                    console.log('jsonRes.Value  2dsfsdfsdd225454445', jsonRes.Value);
+                    try {
+                        jsonRes.Record = JSON.parse(res.value.value.toString('utf8'));
+                    } catch (err) {
+                        console.log(err);
+                        jsonRes.Record = res.value.value.toString('utf8');
+                    }
+                }
+                allResults.push(jsonRes);
+            }
+            res = await iterator.next();
+        }
+        iterator.close();
+        return allResults;
+    }
+
+
+
+
+
+
+
 }
